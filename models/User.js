@@ -1,16 +1,31 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-// Child documents or subdocuments can be embedded into a parent document
-// The bookSchema defines the schema of the subdocument
-// const userSchema = new mongoose.Schema({
-//   username: { type: String, required: true, unique: true, $trim: {}, },
-//   email: Number,
-//   thoughts: ,
-//   friends: ,
-// });
+const userSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, unique: true, trim: {} },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+    },
+    thoughts: [{ type: Schema.Types.ObjectId, ref: "thought" }],
+    friends: [{ type: Schema.Types.ObjectId, ref: "user" }],
+  },
+  {
+    toJSON: {
+      virtuals: true,
+    },
+    id: false,
+  }
+);
+
+userSchema.virtual("friendCount").get(function () {
+  return this.friends.length;
+});
 
 // Uses mongoose.model() to create model
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("user", userSchema);
 
 // Uses model to create new instance including subdocument
 // const bookData = [
