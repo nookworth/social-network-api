@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema(
       unique: true,
       match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
     },
-    thoughts: [{ type: Schema.Types.ObjectId, ref: "thought" }],
-    friends: [{ type: Schema.Types.ObjectId, ref: "user" }],
+    // thoughts: [{ type: Schema.Types.ObjectId, ref: "thought" }],
+    // friends: [{ type: Schema.Types.ObjectId, ref: "user" }],
   },
   {
     toJSON: {
@@ -26,5 +26,11 @@ userSchema.virtual("friendCount").get(function () {
 
 // Uses mongoose.model() to create model
 const User = mongoose.model("user", userSchema);
+
+const handleError = (err) => console.error(err);
+
+// User.create({ username: "nookworth", email: "nooksack@gmail.com" }, (err) =>
+//   err ? handleError(err) : console.log("Created new document")
+// );
 
 module.exports = User;

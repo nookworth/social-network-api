@@ -20,9 +20,9 @@ const thoughtSchema = new mongoose.Schema({
   reactions: [reactionSchema],
 });
 
-thoughtSchema.methods.formatTime = function () {
+// thoughtSchema.methods.formatTime = function () {
     
-}
+// }
 
 userSchema.virtual("reactionCount").get(function () {
   return this.reactions.length;
