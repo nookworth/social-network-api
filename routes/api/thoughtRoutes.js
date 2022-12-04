@@ -76,6 +76,7 @@ router.delete("/:id", async (req, res) => {
   });
 });
 
+// Create a new reaction
 router.post("/:thoughtId/reactions", async (req, res) => {
   const reaction = req.body;
   Thought.findOneAndUpdate(
@@ -95,7 +96,6 @@ router.post("/:thoughtId/reactions", async (req, res) => {
 // Delete a reaction
 router.delete("/:thoughtId/reactions/", async (req, res) => {
   const reactionId = req.body.reactionId;
-  console.log("Reaction ID: ", reactionId);
   Thought.findOneAndUpdate(
     { _id: req.params.thoughtId },
     { $pull: { reactions: { reactionId } } },

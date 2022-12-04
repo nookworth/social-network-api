@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { User } = require("../../models/");
+const { User, Thought } = require("../../models/");
 
 // Get all users
 router.get("/", async (req, res) => {
@@ -26,7 +26,6 @@ router.get("/:id", async (req, res) => {
 //Create a new user
 router.post("/", async (req, res) => {
   const { username, email } = req.body;
-  console.log("HERE", username, email);
   User.create(
     { username: req.body.username, email: req.body.email },
     (err, result) => {
@@ -55,15 +54,23 @@ router.put("/:id", async (req, res) => {
   );
 });
 
-// Delete a user
+// Delete a user and also all associated thoughts
 router.delete("/:id", async (req, res) => {
-  User.findOneAndDelete({ _id: req.params.id }, (err, result) => {
-    if (err) {
-      res.status(500).send({ message: "Internal Server Error" });
-    } else {
-      res.status(200).json(result);
-    }
-  });
+  User.findOneAndDelete({ _id: req.params.id })
+    .then((user) => {
+      return Thought.deleteMany({ username: user.username }, { new: true });
+    })
+    .then((thoughts) =>
+      !thoughts
+        ? res.status(404).json({
+            message: "Error",
+          })
+        : res.json("Deleted the user and all their thoughts!")
+    )
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 // Add a friend to a user's friend list
