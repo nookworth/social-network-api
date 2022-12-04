@@ -10,7 +10,10 @@ const reactionSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-// reactionSchema.methods.formatTime = function () {};
+reactionSchema.methods.formatTimeStamp = function () {
+  const date = new Date(this.createdAt);
+  return date.toString();
+};
 
 const thoughtSchema = new Schema(
   {
@@ -26,17 +29,17 @@ const thoughtSchema = new Schema(
     toJSON: {
       virtuals: true,
     },
-    // id: false,
   }
 );
 
-// thoughtSchema.methods.formatTime = function () {
+thoughtSchema.methods.formatTime = function () {
+  const date = new Date(this.createdAt);
+  return date.toString();
+};
 
-// }
-
-// userSchema.virtual("reactionCount").get(function () {
-//   return this.reactions.length;
-// });
+thoughtSchema.virtual("reactionCount").get(function () {
+  return this.reactions.length;
+});
 
 const Thought = model("Thought", thoughtSchema);
 
