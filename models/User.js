@@ -27,10 +27,4 @@ userSchema.virtual("friendCount").get(function () {
 // Uses mongoose.model() to create model
 const User = model("User", userSchema);
 
-const handleError = (err) => console.error(err);
-
-// User.create({ username: "nookworth", email: "nooksack@gmail.com" }, (err) =>
-//   err ? handleError(err) : console.log("Created new document")
-// );
-
 module.exports = User;
