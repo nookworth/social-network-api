@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
 
 // Get a single thought by _id
 router.get("/:id", async (req, res) => {
-  User.findById(req.params.id, (err, result) => {
+  Thought.findById(req.params.id, (err, result) => {
     if (err) {
       res.status(500).send({ err, message: "Internal Server Error" });
     } else {
@@ -23,24 +23,83 @@ router.get("/:id", async (req, res) => {
   });
 });
 
-// Create a new thought
+// Create a new thought and attach it to a user
 router.post("/", async (req, res) => {
   const thoughtText = req.body.thoughtText;
   const username = req.body.username;
-  console.log("HERE: ", thoughtText, username);
-  Thought.create(
-    { thoughtText: thoughtText, username: username },
+  Thought.create({ thoughtText, username })
+    .then((thought) => {
+      return User.findOneAndUpdate(
+        { username: username },
+        { $addToSet: { thoughts: thought } },
+        { new: true }
+      );
+    })
+    .then((user) =>
+      !user
+        ? res.status(404).json({
+            message: "Thought created, but found no user with that ID",
+          })
+        : res.json("Created the thought!")
+    )
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
+// Update a thought
+router.put("/:id", async (req, res) => {
+  const thoughtText = req.body.thoughtText;
+  Thought.findOneAndUpdate(
+    { _id: req.params.id },
+    { thoughtText },
+    { new: true },
     (err, result) => {
       if (err) {
-        res.status(500).send({ err, message: "Internal Server Error" });
+        res.status(500).send({ message: "Internal Server Error" });
       } else {
         res.status(200).json(result);
       }
     }
   );
-  User.findOneAndUpdate(
-    { username: username },
-    { $addToSet: { thoughts: newThought } },
+});
+
+// Delete a thought
+router.delete("/:id", async (req, res) => {
+  Thought.findOneAndDelete({ _id: req.params.id }, (err, result) => {
+    if (err) {
+      res.status(500).send({ message: "Internal Server Error" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+router.post("/:thoughtId/reactions", async (req, res) => {
+  const reaction = req.body;
+  Thought.findOneAndUpdate(
+    { _id: req.params.thoughtId },
+    { $addToSet: { reactions: reaction } },
+    { new: true },
+    (err, result) => {
+      if (err) {
+        res.status(500).send({ message: "Internal Server Error" });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
+// Delete a reaction
+router.delete("/:thoughtId/reactions/", async (req, res) => {
+  const reactionId = req.body.reactionId;
+  console.log("Reaction ID: ", reactionId);
+  Thought.findOneAndUpdate(
+    { _id: req.params.thoughtId },
+    { $pull: { reactions: { reactionId } } },
+    { new: true },
     (err, result) => {
       if (err) {
         res.status(500).send({ err, message: "Internal Server Error" });

@@ -27,7 +27,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const { username, email } = req.body;
   console.log("HERE", username, email);
-  await User.create(
+  User.create(
     { username: req.body.username, email: req.body.email },
     (err, result) => {
       if (err) {
