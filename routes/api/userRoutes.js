@@ -1,6 +1,7 @@
 const router = require("express").Router();
-const { User } = require("../../models/User");
+const { User } = require("../../models/");
 
+// Get all users
 router.get("/", async (req, res) => {
   User.find({}, (err, result) => {
     if (err) {
@@ -11,6 +12,7 @@ router.get("/", async (req, res) => {
   });
 });
 
+// Get a single user by _id
 router.get("/:id", async (req, res) => {
   User.findById(req.params.id, (err, result) => {
     if (err) {
@@ -21,8 +23,11 @@ router.get("/:id", async (req, res) => {
   });
 });
 
+//Create a new user
 router.post("/", async (req, res) => {
-  User.create(
+  const { username, email } = req.body;
+  console.log("HERE", username, email);
+  await User.create(
     { username: req.body.username, email: req.body.email },
     (err, result) => {
       if (err) {
@@ -32,6 +37,87 @@ router.post("/", async (req, res) => {
       }
     }
   );
+});
+
+// Update a user
+router.put("/:id", async (req, res) => {
+  User.findOneAndUpdate(
+    { _id: req.params.id },
+    { username: req.body.username, email: req.body.email },
+    { new: true },
+    (err, result) => {
+      if (err) {
+        res.status(500).send({ message: "Internal Server Error" });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
+// Delete a user
+router.delete("/:id", async (req, res) => {
+  User.findOneAndDelete({ _id: req.params.id }, (err, result) => {
+    if (err) {
+      res.status(500).send({ message: "Internal Server Error" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+// Add a friend to a user's friend list
+router.post("/:userId/friends/:friendId", async (req, res) => {
+  User.findOneAndUpdate(
+    { _id: req.params.userId },
+    { $addToSet: { friends: req.params.friendId } },
+    { new: true },
+    (err, result) => {
+      if (err) {
+        res.status(500).send({ message: "Internal Server Error" });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
+// Delete a friend from a user's friend list
+router.delete("/:userId/friends/:friendId", async (req, res) => {
+  User.findOneAndUpdate(
+    { _id: req.params.userId },
+    { $pull: { friends: req.params.friendId } },
+    { new: true },
+    (err, result) => {
+      if (err) {
+        res.status(500).send({ message: "Internal Server Error" });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
+// Add many users at once
+router.post("/batch", async (req, res) => {
+  User.insertMany(req.body, (err, result) => {
+    if (err) {
+      res.status(500).send(err, { message: "Internal Server Error" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+// Delete all users
+router.delete("/", async (req, res) => {
+  User.deleteMany({}, (err, result) => {
+    if (err) {
+      res.status(500).send({ message: "Internal Server Error" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
 });
 
 module.exports = router;

@@ -1,22 +1,22 @@
-const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose");
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
-    username: { type: String, required: true, unique: true, trim: {} },
+    username: { type: String, required: true, unique: true, trim: true },
     email: {
       type: String,
       required: true,
       unique: true,
       match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
     },
-    // thoughts: [{ type: Schema.Types.ObjectId, ref: "thought" }],
-    // friends: [{ type: Schema.Types.ObjectId, ref: "user" }],
+    thoughts: [{ type: Schema.Types.ObjectId, ref: "Thought" }],
+    friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   {
     toJSON: {
       virtuals: true,
     },
-    id: false,
+    // id: false,
   }
 );
 
@@ -25,7 +25,7 @@ userSchema.virtual("friendCount").get(function () {
 });
 
 // Uses mongoose.model() to create model
-const User = mongoose.model("user", userSchema);
+const User = model("User", userSchema);
 
 const handleError = (err) => console.error(err);
 
