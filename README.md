@@ -8,8 +8,6 @@ The thought routes include allowing a user to post a new thought (in the form of
 
 MongoDB is the database for the project and the routes utilize mongoose.js.
 
-## Organization
+## Video Walkthrough
 
-## Challenges
-
-
+https://watch.screencastify.com/v/Bhqa1VF7p508EZHdYWhb

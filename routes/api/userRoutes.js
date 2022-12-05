@@ -65,7 +65,7 @@ router.delete("/:id", async (req, res) => {
         ? res.status(404).json({
             message: "Error",
           })
-        : res.json("Deleted the user and all their thoughts!")
+        : res.json(`Deleted user and all their thoughts!`)
     )
     .catch((err) => {
       console.log(err);
